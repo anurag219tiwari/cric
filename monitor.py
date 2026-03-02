@@ -28,11 +28,20 @@ def send_notification():
     print("Notification sent!")
 
 async def main():
-    print("Checking BookMyShow...")
-    is_open = await check_booking_open()
-    if is_open:
-        send_notification()
-    else:
-        print("Still showing Coming Soon.")
+    # Loop for 9 minutes, checking every 30 seconds
+    # GitHub will re-trigger the workflow every 10 mins via cron
+    for i in range(18):  # 18 x 30s = 9 minutes
+        print(f"Check #{i+1}...")
+        try:
+            is_open = await check_booking_open()
+            if is_open:
+                send_notification()
+                return
+            else:
+                print("Still Coming Soon.")
+        except Exception as e:
+            print(f"Error: {e}")
+        
+        await asyncio.sleep(30)
 
 asyncio.run(main())
