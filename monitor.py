@@ -1,6 +1,7 @@
 import asyncio
 import requests
 import os
+import time
 from playwright.async_api import async_playwright
 
 URL = "https://in.bookmyshow.com/sports/icc-men-s-t20-world-cup-2026-semi-final-2/ET00474271"
@@ -28,10 +29,13 @@ def send_notification():
     print("Notification sent!")
 
 async def main():
-    # Loop for 9 minutes, checking every 30 seconds
-    # GitHub will re-trigger the workflow every 10 mins via cron
-    for i in range(18):  # 18 x 30s = 9 minutes
-        print(f"Check #{i+1}...")
+    print("Starting monitor...")
+    start = time.time()
+    i = 0
+
+    while time.time() - start < 540:  # run for exactly 9 minutes
+        i += 1
+        print(f"Check #{i}...")
         try:
             is_open = await check_booking_open()
             if is_open:
@@ -41,7 +45,7 @@ async def main():
                 print("Still Coming Soon.")
         except Exception as e:
             print(f"Error: {e}")
-        
-        await asyncio.sleep(30)
+
+    print("9 minutes done. GitHub will re-trigger.")
 
 asyncio.run(main())
