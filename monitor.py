@@ -14,13 +14,11 @@ async def check_booking_open():
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"
         )
         await page.goto(URL, wait_until="networkidle", timeout=30000)
-        try:
-            await page.wait_for_selector("text=Book Now", timeout=8000)
-            await browser.close()
-            return True
-        except:
-            await browser.close()
-            return False
+        content = await page.content()
+        await browser.close()
+
+        coming_soon = "coming soon" in content.lower()
+        return not coming_soon
 
 def send_heartbeat(check_count):
     requests.post(
